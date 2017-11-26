@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FirstGraphQL.GraphQl;
 using GraphQL;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FirstGraphQL.Controllers {
