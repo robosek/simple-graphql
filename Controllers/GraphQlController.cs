@@ -7,34 +7,46 @@ using GraphQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FirstGraphQL.Controllers
-{
-    [Route("api/[controller]")]
-    public class GraphQlController : Controller
-    {
+namespace FirstGraphQL.Controllers {
+    
+    [Route ("[controller]")]
+    [Produces ("application/json")]
+    public class GraphQlController : Controller {
         private readonly GraphQlQuery _graphQLQuery;
-        private readonly IDocumentExecuter _documentExecuter;
-        private readonly ISchema _schema;
+        private readonly IGraphQlExecuter _executer;
 
-        public GraphQlController(GraphQlQuery graphQlQuery, IDocumentExecuter documentExecuter, ISchema schema)
+        public GraphQlController (GraphQlQuery graphQlQuery, IGraphQlExecuter executer) 
         {
             _graphQLQuery = graphQlQuery;
-            _documentExecuter = documentExecuter;
-            _schema = schema;
+            _executer = executer;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get ([FromQuery] string query) 
+        {
+            if (!string.IsNullOrEmpty(query)) {
+                ExecutionResult result = await _executer.Exectue (new GraphQlParameter { Query = query });
+
+                if (result.Errors?.Count > 0) {
+                    return BadRequest (result.Errors);
+                }
+
+                return Ok (result);
+            }
+
+            return BadRequest ("No query pameter specified");
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] GraphQlParameter query)
+        public async Task<IActionResult> Post ([FromBody] GraphQlParameter query) 
         {
-            var executionOptions = new ExecutionOptions { Schema = _schema, Query = query.Query };
-            var result = await _documentExecuter.ExecuteAsync(executionOptions).ConfigureAwait(false);
+            ExecutionResult result = await _executer.Exectue(query);
 
-            if (result.Errors?.Count > 0)
-            {
-                return BadRequest(result.Errors);
+            if (result.Errors?.Count > 0) {
+                return BadRequest (result.Errors);
             }
 
-            return Ok(result);
+            return Ok (result);
         }
     }
 }

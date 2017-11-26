@@ -25,11 +25,11 @@ namespace FirstGraphQL
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IDocumentExecuter, DocumentExecuter>();
-            services.AddTransient<IPersonService, PersonService>();  
+            services.AddSingleton<IPersonService, PersonService>(); 
+            services.AddTransient<IGraphQlExecuter, GraphQlExecuter>();    
             services.AddTransient<GraphQlParameter>();
             services.AddTransient<GraphQlQuery>();
             services.AddTransient<PersonType>();      
@@ -38,8 +38,6 @@ namespace FirstGraphQL
             var sp = services.BuildServiceProvider();
             services.AddScoped<ISchema>(_ => new GraphQlSchema(type => (GraphType) sp.GetService(type)) {Query = sp.GetService<GraphQlQuery>()});
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())

@@ -9,7 +9,7 @@ namespace FirstGraphQL.GraphQl
         public GraphQlQuery(IPersonService personService)
         {
             Field<ListGraphType<PersonType>>(
-                "persons",
+                "people",
                 resolve: context =>
                 {
                     return personService.Get();
